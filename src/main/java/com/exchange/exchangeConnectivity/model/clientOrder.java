@@ -5,8 +5,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+
 @Entity
-public class OrderInfo {
+public class clientOrder {
 
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
