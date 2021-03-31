@@ -1,26 +1,95 @@
 package com.exchange.exchangeConnectivity.model;
 //import android.arch.persistence.room.Entity;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import javax.persistence.*;
+import java.time.OffsetDateTime;
+import java.util.List;
 
 
-import java.util.Date;
 @Entity
 public class Portfolio {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private int portfolioId;
-
-    private int clientId;
-
     private String portfolioName;
+    private OffsetDateTime createdAt;
+    private OffsetDateTime updatedAt;
+    private int status;
+    @JoinColumn(name = "client_id")
+    @ManyToOne
+    private Client client;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JoinColumn(name = "portfolio_id")
+    @JsonIgnore
+    private List<ClientOrder> orders;
 
-    private Date createdAt;
+    public Portfolio(String portfolioName, int status) {
+        this.portfolioName = portfolioName;
+        this.createdAt = OffsetDateTime.now();
+        this.updatedAt = OffsetDateTime.now();
+        this.status = status;
+    }
 
-    private Date updatedAt;
+    public Portfolio() {
+        this.createdAt = OffsetDateTime.now();
+        this.updatedAt = OffsetDateTime.now();
+    }
 
+    public int getPortfolioId() {
+        return portfolioId;
+    }
 
+    public void setPortfolioId(int portfolioId) {
+        this.portfolioId = portfolioId;
+    }
+
+    public String getPortfolioName() {
+        return portfolioName;
+    }
+
+    public void setPortfolioName(String portfolioName) {
+        this.portfolioName = portfolioName;
+    }
+
+    public OffsetDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(OffsetDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public OffsetDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(OffsetDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    public List<ClientOrder> getOrders() {
+        return orders;
+    }
+
+    public void setOrders(List<ClientOrder> orders) {
+        this.orders = orders;
+    }
+
+    public Client getClient() {
+        return client;
+    }
+
+    public void setClient(Client client) {
+        this.client = client;
+    }
 }

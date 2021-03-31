@@ -1,10 +1,21 @@
 package com.exchange.exchangeConnectivity.controller;
+import com.exchange.exchangeConnectivity.ExchangeApplication;
+import com.exchange.exchangeConnectivity.helper.RedisPoolConfig;
 import com.exchange.exchangeConnectivity.model.*;
 import com.exchange.exchangeConnectivity.repo.OrderRepository;
 import com.exchange.exchangeConnectivity.service.ExchangeClient;
 import com.exchange.exchangeConnectivity.service.OrderService;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
+import redis.clients.jedis.Jedis;
+
+
+
+import java.util.List;
+//import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static com.exchange.exchangeConnectivity.helper.Helper.removeQuotesFromStartAndEndOfString;
 
@@ -14,6 +25,8 @@ import static com.exchange.exchangeConnectivity.helper.Helper.removeQuotesFromSt
 @RequestMapping(path="/exchange")
 public class ExchangeController {
 
+    //private static final Logger logger = LoggerFactory.getLogger(ExchangeApplication.class);
+
     @Autowired
     private OrderRepository orderRepository;
 
@@ -21,7 +34,7 @@ public class ExchangeController {
     private OrderService orderService;
 
 
-    clientOrder n = new clientOrder();
+    OrderInfo n = new OrderInfo();
     ExchangeClient ec= new ExchangeClient();
     PostOrder p = new PostOrder();
 
@@ -29,7 +42,7 @@ public class ExchangeController {
 
     @PostMapping(path="/receiveOrders")
     public @ResponseBody
-    OrderServiceResponse postBody(@RequestBody clientOrder order)  {
+    OrderServiceResponse postBody(@RequestBody OrderInfo order)  {
 
         var oderIds= order.getOrderId();
         var orderPrice = order.getPrice();
@@ -37,8 +50,6 @@ public class ExchangeController {
         var clientId=order.getClientId();
         var side=order.getSide();
         var product=order.getProduct();
-        var exchangeOrderId=order.getExchangeOrderId();
-        var status =order.getStatus();
         var portfolioId=order.getPortfolioId();
 
         n.setOrderId(oderIds);
@@ -47,8 +58,6 @@ public class ExchangeController {
         n.setClientId(clientId);
         n.setSide(side);
         n.setProduct(product);
-        n.setExchangeOrderId(exchangeOrderId);
-        n.setStatus(status);
         n.setPortfolioId(portfolioId);
 
 
@@ -65,7 +74,19 @@ public class ExchangeController {
 
         n.setExchangeOrderId(trimmedResult);
 
-        var data=  orderService.data(n);
+
+        Client client= new Client();
+        client.setClientId(clientId);
+
+
+        ClientOrder c = new ClientOrder();
+        c.setClient(client);
+
+        c.setExchangeOrderId(trimmedResult);
+        c.setStatus("PENDING");
+
+
+        var data=  orderService.data(c);
 
         return data;
 
@@ -78,24 +99,42 @@ public class ExchangeController {
     public @ResponseBody
     String updateOrder(@RequestBody PostOrder order)  {
 
-        var oderIds= order.id;
+        var exchangeOrderId= order.exchangeOrderId;
         var orderPrice = order.price;
         var quantity = order.quantity;
-
+        var orderId = order.OrderId;
         var side=order.side;
         var product=order.product;
+
+        var clientId= order.clientId;
+
+        var  malonExchange =order.MalonExchange;
 
         p.price=orderPrice; //2
         p.quantity=quantity; //4
         p.side=side;//BUY
         p.product=product; //"IBM";
+        //p.clientId=clientId;
+       // p.MalonExchange=malonExchange;
 
-        String result = ec.updateOrder(p);
+
+        String result = ec.updateOrder(p,clientId,malonExchange,orderId,exchangeOrderId);
 
         return  result;
     }
 
 
+
+
+//    @Scheduled(fixedRate = 5000)
+//    public void getOrderFromQueue() {
+//        try(Jedis jedis = RedisPoolConfig.getJedisPool().getResource()) {
+//            List<String> orderList = jedis.blpop(3, "trade-order-queue");
+//            logger.debug("Received: "+ orderList.get(0));
+//        }catch (Exception e) {
+//            logger.error("jedis client failed: "+ e.getMessage());
+//        }
+//    }
 
 
 
@@ -108,12 +147,6 @@ public class ExchangeController {
         var data = ec.deleteExchangeOrder(orderId);
         return data;
     }
-
-
-
-
-
-
 
 
 }

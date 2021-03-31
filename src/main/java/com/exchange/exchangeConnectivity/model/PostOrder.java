@@ -10,7 +10,13 @@ public class PostOrder {
 
   public String side;
 
-  public String id;
+  public String exchangeOrderId;
+
+  public String clientId;
+
+  public String OrderId;
+
+  public String MalonExchange;
 
 
 }

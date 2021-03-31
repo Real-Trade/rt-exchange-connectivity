@@ -15,6 +15,9 @@ import java.util.Map;
 public class ExchangeClient {
 
     RestTemplate restTemplate = new RestTemplate();
+    String MALEX1="https://exchange.matraining.com";
+    String MALEX2="https://exchange2.matraining.com";
+
 
     public String createOrder(PostOrder p){
 
@@ -22,18 +25,30 @@ public class ExchangeClient {
 
         String result= restTemplate.postForObject(url,p,String.class);
 
+        assert result != null;
         return result.toString();
 
     }
 
 
 
-    public String updateOrder(PostOrder p){
+    public String updateOrder(PostOrder p,String clientId,String malonExchange,String OrderId,String exchangeOrderId){
 
-        String url="https://exchange.matraining.com/4ce06004-76ce-4d27-a2d5-5e379c62d280/order";
+        var endpoint="";
+        if(malonExchange.equals("MALEX1")){
+
+       endpoint=MALEX1;
+        }
+        else{
+            endpoint=MALEX2;
+        }
+
+
+        String url=endpoint+"4ce06004-76ce-4d27-a2d5-5e379c62d280/order"+exchangeOrderId;
 
         String result= restTemplate.postForObject(url,p,String.class);
 
+        assert result != null;
         return result.toString();
 
     }

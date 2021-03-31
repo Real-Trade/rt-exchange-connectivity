@@ -1,33 +1,44 @@
 package com.exchange.exchangeConnectivity.model;
 
-import javax.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import javax.persistence.*;
+import java.time.OffsetDateTime;
+import java.util.List;
 @Entity
 public class Client {
 
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
-
-    @Column(name = "clientId")
     private int clientId;
     private String firstName;
-
     private  String lastName;
-
+    @Column(unique = true)
     private String email;
-
     private String password;
+    private int status;
+    private OffsetDateTime createdAt;
+    private OffsetDateTime updatedAt;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "client", orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Portfolio> portfolio;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "client", orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<ClientOrder> orders;
 
-    private int accountNumber;
-    private String createdAt;
+    public Client() {
+        this.createdAt = OffsetDateTime.now();
+        this.updatedAt = OffsetDateTime.now();
+    }
 
-    private String updateAt;
-
-//    @OneToOne(cascade = CascadeType.ALL)
-//    @JoinColumn(name = "address_id", referencedColumnName = "clientId")
-    //private Account account;
-
-
+    public Client(String firstName, String lastName, String email, String password) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.password = password;
+        this.createdAt = OffsetDateTime.now();
+        this.updatedAt = OffsetDateTime.now();
+    }
 
     public int getClientId() {
         return clientId;
@@ -69,28 +80,20 @@ public class Client {
         this.password = password;
     }
 
-    public int getAccountNumber() {
-        return accountNumber;
-    }
-
-    public void setAccountNumber(int accountNumber) {
-        this.accountNumber = accountNumber;
-    }
-
-    public String getCreatedAt() {
+    public OffsetDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(String createdAt) {
+    public void setCreatedAt(OffsetDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
-    public String getUpdateAt() {
-        return updateAt;
+    public OffsetDateTime getUpdateAt() {
+        return updatedAt;
     }
 
-    public void setUpdateAt(String updateAt) {
-        this.updateAt = updateAt;
+    public void setUpdateAt(OffsetDateTime updateAt) {
+        this.updatedAt = updateAt;
     }
 
     public int getStatus() {
@@ -101,6 +104,28 @@ public class Client {
         this.status = status;
     }
 
-    private int status;
+//    public Account getAccount() {
+//        return account;
+//    }
+//
+//    public void setAccount(Account account) {
+//        this.account = account;
+//    }
 
+//    public List<Portfolio> getPortfolio() {
+//        return portfolio;
+//    }
+//
+//    public void setPortfolio(List<Portfolio> portfolio) {
+//        this.portfolio = portfolio;
+//    }
+//
+//    public List<ClientOrder> getOrders() {
+//        return orders;
+//    }
+//
+//    public void setOrders(List<ClientOrder> orders) {
+//        this.orders = orders;
+//    }
 }
+

@@ -1,21 +1,31 @@
 package com.exchange.exchangeConnectivity.model;
 
 import javax.persistence.*;
-
+import java.time.OffsetDateTime;
 @Entity
 public class Account {
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
     private int accountId;
-    private int clientId;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private int accountNumber;
     private  double balance;
+    private OffsetDateTime createdAt;
+    private OffsetDateTime updatedAt;
+    @JoinColumn(name = "client_id")
+    @OneToOne
+    private Client client;
 
-//    @OneToOne(mappedBy ="Client")
-//    private Client client;
+    public Account() {
+        this.createdAt = OffsetDateTime.now();
+        this.updatedAt = OffsetDateTime.now();
+    }
 
-
-
-
+    public Account(double balance) {
+        this.balance = balance;
+        this.createdAt = OffsetDateTime.now();
+        this.updatedAt = OffsetDateTime.now();
+    }
 
     public int getAccountId() {
         return accountId;
@@ -25,12 +35,12 @@ public class Account {
         this.accountId = accountId;
     }
 
-    public int getClientId() {
-        return clientId;
+    public Client getClient() {
+        return client;
     }
 
-    public void setClientId(int clientId) {
-        this.clientId = clientId;
+    public void setClient(Client client) {
+        this.client = client;
     }
 
     public double getBalance() {
@@ -41,7 +51,28 @@ public class Account {
         this.balance = balance;
     }
 
+    public OffsetDateTime getCreatedAt() {
+        return createdAt;
+    }
 
+    public void setCreatedAt(OffsetDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
 
+    public OffsetDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(OffsetDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public int getAccountNumber() {
+        return accountNumber;
+    }
+
+    public void setAccountNumber(int accountNumber) {
+        this.accountNumber = accountNumber;
+    }
 
 }
